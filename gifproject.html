@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GIF</title>
+
+     
+    <link rel="stylesheet" type="text/css" href="reset.css">
+
+    <style type="text/css">
+    body  {
+     
+      /*  background-image: url("./assets/chemistry.jpg");*/
+        background-image: url("./assets/background.jpg");
+         /* Full height */
+    height: 100%; 
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    /*background: url(asdlkf);*/
+  }
+  </style>
+</head>
+<body>
+	<div id="buttons">
+    <button data-animal="Sloth" class="buttonToGetGifs" >
+      Sloth
+    </button>
+		<button data-animal="lemur" class="buttonToGetGifs">
+      Lemur
+    </button>
+    <button data-animal="parrot" class="buttonToGetGifs">
+      Parrot
+    </button>
+
+<!-- rendered buttons dump here  -->
+<div id="buttons-view"></div>
+
+<form id="animal-form">
+      <label for="animal-input">Add an animal</label>
+      <input type="text" id="animal-input"><br>
+
+      <!-- Button triggers new animal to be added -->
+      <input id="add-animal" type="submit" value="add-animal">
+    </form>
+    
+
+	</div>
+	
+	<div id="putGifsHere"></div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript">
+
+	$("#buttons").on("click", ".buttonToGetGifs", function(){
+    $("#putGifsHere").empty();
+		var animal = $(this).attr("data-animal");
+    console.log($(this));
+		var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+        animal + "&api_key=09810f5356d5434f988bea73ff382771";
+        console.log(queryURL);
+        $.ajax ({
+        	url: queryURL,
+        	method: "GET"
+        })
+        .done(function(response){
+        	var results = response.data;
+
+        	for (var i=0; i<results.length; i++) {
+        			var gifDiv = $("<div class='item'>");
+        			var animalImage = $("<img>");
+              var rating = results[i].rating;
+              var p = $("<p>").text("Rating:" + rating);
+
+              animalImage.addClass("item");
+               animalImage.attr("data-still", results[i].images.fixed_height_small_still.url);
+              animalImage.attr("data-animate", results[i].images.fixed_height.url);
+              animalImage.attr("data-state", "still" );
+              
+              animalImage.attr("src", animalImage.attr("data-still"));
+              
+
+             
+
+
+
+        			gifDiv.prepend(animalImage);
+              gifDiv.prepend(p);
+        			$("#putGifsHere").prepend(gifDiv);
+
+        	}
+        });
+ 
+
+	});
+  $("#putGifsHere").on("click", '.item', function() {
+    if ($(this).attr("data-state") === "still"){
+        $(this).attr("data-state", "animate");
+        $(this).attr("src", $(this).attr("data-animate"));
+    }
+    else {
+      $(this).attr("data-state", "still");
+      $(this).attr("src", $(this).attr("data-still"));
+    }
+  });
+  $("#add-animal").on("click", function(event){
+      event.preventDefault();
+
+      var a = $("#animal-input").val().trim();
+      console.log(a); 
+
+
+      var newButton = $("<button>");
+
+      newButton.attr("type", "button");
+
+      newButton.attr("class", "buttonToGetGifs");
+
+      newButton.attr("data-animal", a);
+
+      newButton.html(a);
+
+      $("#buttons").prepend(newButton);
+
+     
+
+      
+  });
+
+
+  
+	</script>
+</body>
+</html>
